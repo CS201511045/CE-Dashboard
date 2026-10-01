@@ -343,7 +343,7 @@
         </div>
       </section>
 
-      <!-- [완벽 작동] 3. 라운드별 엔지니어링 자료 업로드 & 삭제 & 열람 아카이브 -->
+      <!-- 3. 라운드별 엔지니어링 자료 업로드 & 삭제 & 열람 아카이브 -->
       <section class="bg-white p-3.5 rounded-xl border border-blue-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
           <div>
@@ -356,7 +356,7 @@
           <span id="drawerAttachmentCount" class="text-xs font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700">0건</span>
         </div>
 
-        <!-- 탭 전환: [파일 직접 첨부] vs [클라우드 / 팀즈 링크 등록] -->
+        <!-- 탭 전환 -->
         <div class="bg-slate-100 p-1 rounded-lg flex items-center gap-1 text-[11px] font-semibold">
           <button type="button" id="tabUploadFileBtn" onclick="window.switchAttachmentTab('file')" class="flex-1 py-1 rounded bg-white shadow-sm text-blue-700 text-center transition-all">
             📁 로컬 파일 직접 첨부
@@ -855,6 +855,15 @@
     }
 
     async function saveModelData(model) {
+      // 1. 메모리 상의 전역 models 배열 즉각 갱신
+      const idx = models.findIndex(m => m.id === model.id);
+      if (idx !== -1) {
+        models[idx] = model;
+      } else {
+        models.unshift(model);
+      }
+
+      // 2. Firestore 클라우드 동기화 (바이너리 필드 제외)
       if (isFirebaseReady && db) {
         try {
           const sanitized = JSON.parse(JSON.stringify(model));
@@ -862,16 +871,12 @@
             sanitized.attachments.forEach(att => delete att.fileData);
           }
           await setDoc(doc(db, "footwear_models", sanitized.id), sanitized);
-          return;
         } catch (e) {
           console.error("클라우드 저장 실패, 로컬에 저장:", e);
         }
       }
       
-      const idx = models.findIndex(m => m.id === model.id);
-      if (idx !== -1) models[idx] = model;
-      else models.unshift(model);
-
+      // 3. 로컬스토리지 백업 저장
       try {
         const localClean = JSON.parse(JSON.stringify(models));
         localClean.forEach(m => {
@@ -890,7 +895,6 @@
       if (isFirebaseReady && db) {
         try {
           await deleteDoc(doc(db, "footwear_models", modelId));
-          return;
         } catch (e) {
           console.error("클라우드 삭제 실패, 로컬에서 삭제:", e);
         }
@@ -1661,7 +1665,7 @@
       let html = '';
       atts.forEach(att => {
         const isLink = !!att.linkUrl;
-        const memoryBlob = sessionFileStore.get(att.id);
+        const memoryBlob = sessionFileStore.get(String(att.id));
 
         let actionBtnHtml = '';
         if (isLink) {
@@ -1682,6 +1686,7 @@
           actionBtnHtml = `<span class="text-[10px] text-slate-400 font-medium px-1.5 py-0.5 rounded bg-slate-100">등록 완료</span>`;
         }
 
+        // 인라인 따옴표 충돌 없는 데이터 속성 바인딩 방식 채택
         html += `
           <div class="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 flex items-center justify-between transition-colors">
             <div class="flex items-center gap-2 min-w-0">
@@ -1696,8 +1701,7 @@
             </div>
             <div class="flex items-center gap-1.5 shrink-0 ml-2">
               ${actionBtnHtml}
-              <!-- 삭제 버튼: 이벤트 위임 및 attId 안전 바인딩 -->
-              <button type="button" onclick="window.handleDeleteAttachment('${att.id}')" class="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="자료 삭제">
+              <button type="button" data-del-id="${att.id}" onclick="window.triggerDeleteAttachment(this)" class="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="자료 삭제">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
               </button>
             </div>
@@ -1784,13 +1788,21 @@
       }
     };
 
-    // [핵심 버그 픽스] 완벽하게 동작하는 삭제 핸들러
+    // [버그 수정 완료] 안전한 이벤트 위임형 삭제 트리거
+    window.triggerDeleteAttachment = function(buttonElem) {
+      const attId = buttonElem.getAttribute('data-del-id');
+      if (attId) {
+        window.handleDeleteAttachment(attId);
+      }
+    };
+
     window.handleDeleteAttachment = async function(attId) {
       if (!selectedModelId) {
         alert("선택된 모델 정보를 찾을 수 없습니다.");
         return;
       }
 
+      // 대상 모델 식별
       const m = models.find(item => item.id === selectedModelId);
       if (!m || !m.attachments) {
         alert("첨부자료가 존재하지 않습니다.");
@@ -1798,19 +1810,21 @@
       }
 
       if (window.confirm("정말로 이 첨부 자료를 삭제하시겠습니까?")) {
-        // 1. 메모리 캐시 해제
-        if (sessionFileStore.has(attId)) {
-          URL.revokeObjectURL(sessionFileStore.get(attId));
-          sessionFileStore.delete(attId);
+        const targetId = String(attId);
+
+        // 1. 메모리 ObjectURL 해제
+        if (sessionFileStore.has(targetId)) {
+          URL.revokeObjectURL(sessionFileStore.get(targetId));
+          sessionFileStore.delete(targetId);
         }
 
-        // 2. 리스트에서 확실하게 제거
-        m.attachments = m.attachments.filter(att => att.id !== attId);
+        // 2. ID 타입 안전 비교 필터링
+        m.attachments = m.attachments.filter(att => String(att.id) !== targetId);
 
-        // 3. 클라우드 및 로컬스토리지에 저장 반영
+        // 3. 클라우드 및 로컬스토리지 영구 반영
         await saveModelData(m);
 
-        // 4. 드로어 목록 및 메인 대시보드 배지 즉시 다시 그리기
+        // 4. 화면 즉시 갱신
         renderDrawerAttachments(m);
         renderDashboard();
       }

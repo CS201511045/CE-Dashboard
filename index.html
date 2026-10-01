@@ -49,7 +49,6 @@
       </div>
 
       <div class="flex items-center space-x-2 sm:space-x-3">
-        <!-- 뷰 전환 토글 (테이블 / 칸반) -->
         <div class="bg-neutral-900 border border-neutral-800 p-1 rounded-lg flex items-center space-x-1">
           <button id="viewTableBtn" onclick="switchView('table')" class="px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors bg-neutral-800 text-white">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -76,13 +75,10 @@
   <!-- 메인 대시보드 레이아웃 -->
   <main class="max-w-[1700px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 flex-1 flex flex-col space-y-5">
     
-    <!-- 카테고리 탭 & 시즌/담당자별 모델 수 요약 바 -->
     <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-col gap-3.5">
       <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
-        <!-- 카테고리 탭 -->
         <div class="flex flex-wrap items-center gap-1.5" id="categoryTabsContainer"></div>
 
-        <!-- 검색 & 단계/시즌/담당자 필터 -->
         <div class="flex flex-wrap items-center gap-2">
           <div class="relative">
             <svg class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -123,7 +119,7 @@
         <div id="seasonChipsContainer" class="flex flex-wrap gap-1.5 custom-scrollbar overflow-x-auto pb-1"></div>
       </div>
 
-      <!-- 담당자별 모델 수 현황 칩 바 -->
+      <!-- 담당 엔지니어별 모델 수 현황 칩 바 -->
       <div class="pt-2 border-t border-slate-100">
         <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center justify-between">
           <span class="flex items-center gap-1.5">
@@ -138,7 +134,6 @@
 
     <!-- KPI 요약 카드 4종 -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <!-- 1. LAB TEST FAIL 현황 -->
       <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-col justify-between">
         <div class="flex items-center justify-between">
           <span class="text-xs font-bold text-slate-500 tracking-wider">LAB TEST FAIL 현황</span>
@@ -159,7 +154,6 @@
         </div>
       </div>
 
-      <!-- 2. Wear Test 유무 현황 -->
       <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-col justify-between">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-1.5">
@@ -178,7 +172,6 @@
         <p class="text-[11px] text-slate-500">PR / GGP / SPA 단계 대상 실착 시험</p>
       </div>
 
-      <!-- 3. NPI 진행 & CE T/P 현황 -->
       <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-col justify-between">
         <div class="flex items-center justify-between">
           <span class="text-xs font-bold text-slate-500 tracking-wider">NPI 진행 & CE T/P</span>
@@ -197,7 +190,6 @@
         <p class="text-[11px] text-slate-500">초도 양산 수율 검증 및 CE T/P 공유 현황</p>
       </div>
 
-      <!-- 4. RFC 준비 현황 -->
       <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-col justify-between">
         <div class="flex items-center justify-between">
           <span class="text-xs font-bold text-slate-500 tracking-wider">RFC 준비</span>
@@ -214,7 +206,7 @@
       </div>
     </div>
 
-    <!-- 메인 컨텐츠 영역: 테이블 뷰 -->
+    <!-- 테이블 뷰 -->
     <div id="tableViewSection" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex-1 flex flex-col">
       <div class="overflow-x-auto custom-scrollbar flex-1">
         <table class="w-full text-left border-collapse text-xs">
@@ -237,7 +229,7 @@
       </div>
     </div>
 
-    <!-- 메인 컨텐츠 영역: 칸반 보드 뷰 (7단계) -->
+    <!-- 칸반 보드 뷰 -->
     <div id="kanbanViewSection" class="hidden flex-1 overflow-x-auto custom-scrollbar pb-2">
       <div id="kanbanColumnsContainer" class="flex gap-3.5 min-w-[1400px]"></div>
     </div>
@@ -351,7 +343,7 @@
         </div>
       </section>
 
-      <!-- [개선된 자료 아카이브] 3. 라운드별 주요 엔지니어링 자료 업로드 & 링크 등록 -->
+      <!-- [완벽 작동] 3. 라운드별 엔지니어링 자료 업로드 & 삭제 & 열람 아카이브 -->
       <section class="bg-white p-3.5 rounded-xl border border-blue-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
           <div>
@@ -408,11 +400,11 @@
             <input type="file" id="uploadFileInput" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[11px] file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
           </div>
 
-          <!-- 모드 2: 링크 등록 입력창 (숨김 기본) -->
+          <!-- 모드 2: 링크 등록 입력창 -->
           <div id="sectionAttachLink" class="hidden space-y-1.5">
             <div>
               <label class="text-[10px] text-slate-500 font-bold block mb-0.5">자료 제목 (표시명)</label>
-              <input type="text" id="uploadLinkTitle" placeholder="예: [SPA] 힐컵 접착 공정 개선 보고서.xlsx" class="w-full bg-white border border-slate-200 rounded p-1.5 text-xs">
+              <input type="text" id="uploadLinkTitle" placeholder="예: [SPA] 힐 스트랩 접착 공정 검증서.xlsx" class="w-full bg-white border border-slate-200 rounded p-1.5 text-xs">
             </div>
             <div>
               <label class="text-[10px] text-slate-500 font-bold block mb-0.5">SharePoint / OneDrive / 웹 링크 URL</label>
@@ -430,9 +422,7 @@
         </div>
 
         <!-- 업로드된 첨부파일 목록 리스트 -->
-        <div id="drawerAttachmentList" class="space-y-1.5 max-h-56 overflow-y-auto custom-scrollbar pt-1">
-          <!-- 동적 주입 -->
-        </div>
+        <div id="drawerAttachmentList" class="space-y-1.5 max-h-56 overflow-y-auto custom-scrollbar pt-1"></div>
       </section>
 
       <!-- 4. NPI 진행 -->
@@ -805,7 +795,6 @@
     let currentView = 'table';
     let selectedModelId = null;
 
-    // 세션 메모리 파일 저장소 (용량 제한 없이 로컬 다운로드 지원)
     const sessionFileStore = new Map();
 
     function getFailedLabTests(model) {
@@ -854,27 +843,23 @@
       syncBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Local Cache Mode';
       syncBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1';
       
-      const stored = localStorage.getItem('nike_dev_models_v17');
+      const stored = localStorage.getItem('nike_dev_models_v18');
       if (stored) {
         try { models = JSON.parse(stored); } catch(e) { models = INITIAL_MODELS; }
       } else {
         models = INITIAL_MODELS;
-        localStorage.setItem('nike_dev_models_v17', JSON.stringify(models));
+        localStorage.setItem('nike_dev_models_v18', JSON.stringify(models));
       }
       updateEngineerOptions();
       renderDashboard();
     }
 
-    // Firestore 1MB 제한 극복: Base64 바이너리를 제외한 메타데이터만 동기화
     async function saveModelData(model) {
       if (isFirebaseReady && db) {
         try {
-          // Firestore 저장용 복사본 생성 (바이너리 필드 제외하여 1MB 에러 원천 차단)
           const sanitized = JSON.parse(JSON.stringify(model));
           if (sanitized.attachments) {
-            sanitized.attachments.forEach(att => {
-              delete att.fileData; // 바이너리 제거
-            });
+            sanitized.attachments.forEach(att => delete att.fileData);
           }
           await setDoc(doc(db, "footwear_models", sanitized.id), sanitized);
           return;
@@ -883,7 +868,6 @@
         }
       }
       
-      // 로컬스토리지 저장 시에도 바이너리를 제외하고 저장 (5MB Quota 초과 방지)
       const idx = models.findIndex(m => m.id === model.id);
       if (idx !== -1) models[idx] = model;
       else models.unshift(model);
@@ -893,7 +877,7 @@
         localClean.forEach(m => {
           if (m.attachments) m.attachments.forEach(att => delete att.fileData);
         });
-        localStorage.setItem('nike_dev_models_v17', JSON.stringify(localClean));
+        localStorage.setItem('nike_dev_models_v18', JSON.stringify(localClean));
       } catch (err) {
         console.warn("로컬스토리지 저장 실패:", err);
       }
@@ -912,7 +896,7 @@
         }
       }
       models = models.filter(m => m.id !== modelId);
-      localStorage.setItem('nike_dev_models_v17', JSON.stringify(models));
+      localStorage.setItem('nike_dev_models_v18', JSON.stringify(models));
       updateEngineerOptions();
       renderDashboard();
     }
@@ -1481,7 +1465,6 @@
       }
     };
 
-    // 첨부 탭 전환 함수 (파일 vs 링크)
     let currentAttachMode = 'file';
     window.switchAttachmentTab = function(mode) {
       currentAttachMode = mode;
@@ -1555,7 +1538,6 @@
       document.getElementById('drawerMidsoleMcs').value = m.midsoleMcs || MIDSOLE_MCS_LIST[0];
       document.getElementById('drawerOutsoleMcs').value = m.outsoleMcs || OUTSOLE_MCS_LIST[0];
 
-      // 업로드 라운드 기본값 설정
       document.getElementById('uploadRound').value = m.stage;
       document.getElementById('uploadFileInput').value = '';
       document.getElementById('uploadLinkTitle').value = '';
@@ -1714,6 +1696,7 @@
             </div>
             <div class="flex items-center gap-1.5 shrink-0 ml-2">
               ${actionBtnHtml}
+              <!-- 삭제 버튼: 이벤트 위임 및 attId 안전 바인딩 -->
               <button type="button" onclick="window.handleDeleteAttachment('${att.id}')" class="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="자료 삭제">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
               </button>
@@ -1725,7 +1708,7 @@
       listContainer.innerHTML = html;
     }
 
-    // [완벽한 업로드 핸들러] 파일 직접 첨부 & 링크 등록 지원
+    // 파일 업로드 핸들러
     window.handleUploadAttachment = async function() {
       const m = models.find(item => item.id === selectedModelId);
       if (!m) {
@@ -1740,7 +1723,6 @@
       const attId = 'att_' + Date.now();
 
       if (currentAttachMode === 'link') {
-        // [모드 B: 클라우드/팀즈 링크 등록]
         const linkTitle = document.getElementById('uploadLinkTitle').value.trim();
         const linkUrl = document.getElementById('uploadLinkUrl').value.trim();
 
@@ -1767,9 +1749,7 @@
         renderDrawerAttachments(m);
         document.getElementById('uploadLinkTitle').value = '';
         document.getElementById('uploadLinkUrl').value = '';
-        alert("링크 자료가 성공적으로 등록되었습니다!");
       } else {
-        // [모드 A: 파일 직접 첨부]
         const fileInput = document.getElementById('uploadFileInput');
         if (!fileInput.files || fileInput.files.length === 0) {
           alert("업로드할 파일을 선택해 주세요.");
@@ -1781,7 +1761,6 @@
           ? (file.size / (1024 * 1024)).toFixed(1) + " MB" 
           : Math.round(file.size / 1024) + " KB";
 
-        // 세션 메모리에 ObjectURL 생성 (용량 제한 없이 로컬 다운로드 가능)
         const blobUrl = URL.createObjectURL(file);
         sessionFileStore.set(attId, blobUrl);
 
@@ -1802,24 +1781,38 @@
         await saveModelData(m);
         renderDrawerAttachments(m);
         fileInput.value = '';
-        alert(`'${file.name}' 자료가 성공적으로 등록되었습니다!`);
       }
     };
 
-    // [완벽한 삭제 핸들러]
+    // [핵심 버그 픽스] 완벽하게 동작하는 삭제 핸들러
     window.handleDeleteAttachment = async function(attId) {
+      if (!selectedModelId) {
+        alert("선택된 모델 정보를 찾을 수 없습니다.");
+        return;
+      }
+
       const m = models.find(item => item.id === selectedModelId);
-      if (!m || !m.attachments) return;
+      if (!m || !m.attachments) {
+        alert("첨부자료가 존재하지 않습니다.");
+        return;
+      }
 
       if (window.confirm("정말로 이 첨부 자료를 삭제하시겠습니까?")) {
-        // 메모리 해제
+        // 1. 메모리 캐시 해제
         if (sessionFileStore.has(attId)) {
           URL.revokeObjectURL(sessionFileStore.get(attId));
           sessionFileStore.delete(attId);
         }
+
+        // 2. 리스트에서 확실하게 제거
         m.attachments = m.attachments.filter(att => att.id !== attId);
+
+        // 3. 클라우드 및 로컬스토리지에 저장 반영
         await saveModelData(m);
+
+        // 4. 드로어 목록 및 메인 대시보드 배지 즉시 다시 그리기
         renderDrawerAttachments(m);
+        renderDashboard();
       }
     };
 

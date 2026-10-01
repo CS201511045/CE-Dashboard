@@ -351,20 +351,30 @@
         </div>
       </section>
 
-      <!-- [신규 기능] 3. 라운드별 주요 엔지니어링 자료 아카이브 (BPFC, 본딩, NPI 등) -->
+      <!-- [개선된 자료 아카이브] 3. 라운드별 주요 엔지니어링 자료 업로드 & 링크 등록 -->
       <section class="bg-white p-3.5 rounded-xl border border-blue-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
           <div>
             <h3 class="font-bold text-slate-800 flex items-center gap-1.5">
               <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-              라운드별 엔지니어링 자료 업로드 & 아카이브
+              라운드별 엔지니어링 자료 아카이브
             </h3>
-            <p class="text-[11px] text-slate-400">Chemical Engineer 필수 자료: BPFC / 본딩 결과 / NPI 자료 / 성적서 등</p>
+            <p class="text-[11px] text-slate-400">Chemical Engineer 필수 자료: BPFC / 본딩 결과 / NPI 자료 / 성적서</p>
           </div>
           <span id="drawerAttachmentCount" class="text-xs font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700">0건</span>
         </div>
 
-        <!-- 파일 업로드 입력 폼 -->
+        <!-- 탭 전환: [파일 직접 첨부] vs [클라우드 / 팀즈 링크 등록] -->
+        <div class="bg-slate-100 p-1 rounded-lg flex items-center gap-1 text-[11px] font-semibold">
+          <button type="button" id="tabUploadFileBtn" onclick="window.switchAttachmentTab('file')" class="flex-1 py-1 rounded bg-white shadow-sm text-blue-700 text-center transition-all">
+            📁 로컬 파일 직접 첨부
+          </button>
+          <button type="button" id="tabUploadLinkBtn" onclick="window.switchAttachmentTab('link')" class="flex-1 py-1 rounded text-slate-600 hover:text-slate-900 text-center transition-all">
+            🔗 Teams / SharePoint 링크 등록
+          </button>
+        </div>
+
+        <!-- 자료 등록 입력 폼 -->
         <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 space-y-2">
           <div class="grid grid-cols-2 gap-2">
             <div>
@@ -391,21 +401,36 @@
               </select>
             </div>
           </div>
-          <div>
-            <label class="text-[10px] text-slate-500 font-bold block mb-0.5">파일 선택 (PDF, Excel, Word, 이미지, ZIP 등)</label>
+
+          <!-- 모드 1: 파일 첨부 입력창 -->
+          <div id="sectionAttachFile">
+            <label class="text-[10px] text-slate-500 font-bold block mb-0.5">문서 파일 선택 (PDF, Excel, 이미지, ZIP 등)</label>
             <input type="file" id="uploadFileInput" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[11px] file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
           </div>
+
+          <!-- 모드 2: 링크 등록 입력창 (숨김 기본) -->
+          <div id="sectionAttachLink" class="hidden space-y-1.5">
+            <div>
+              <label class="text-[10px] text-slate-500 font-bold block mb-0.5">자료 제목 (표시명)</label>
+              <input type="text" id="uploadLinkTitle" placeholder="예: [SPA] 힐컵 접착 공정 개선 보고서.xlsx" class="w-full bg-white border border-slate-200 rounded p-1.5 text-xs">
+            </div>
+            <div>
+              <label class="text-[10px] text-slate-500 font-bold block mb-0.5">SharePoint / OneDrive / 웹 링크 URL</label>
+              <input type="url" id="uploadLinkUrl" placeholder="https://..." class="w-full bg-white border border-slate-200 rounded p-1.5 text-xs font-mono text-blue-700">
+            </div>
+          </div>
+
           <div class="flex items-center justify-between pt-1">
-            <span class="text-[10px] text-slate-400">* 팀원들과 함께 다운로드하여 열람할 수 있습니다.</span>
-            <button type="button" onclick="window.handleUploadAttachment()" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold text-xs shadow-sm flex items-center gap-1">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-              자료 업로드 등록
+            <span class="text-[10px] text-slate-400" id="uploadHelpText">* 대용량 보고서는 Teams/SharePoint 링크 등록을 권장합니다.</span>
+            <button type="button" onclick="window.handleUploadAttachment()" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold text-xs shadow-sm flex items-center gap-1 transition-all">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              자료 등록하기
             </button>
           </div>
         </div>
 
         <!-- 업로드된 첨부파일 목록 리스트 -->
-        <div id="drawerAttachmentList" class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar pt-1">
+        <div id="drawerAttachmentList" class="space-y-1.5 max-h-56 overflow-y-auto custom-scrollbar pt-1">
           <!-- 동적 주입 -->
         </div>
       </section>
@@ -668,7 +693,7 @@
     const LAB_TEST_KEYS = ['Assembly', 'Stockfit', 'No-sew', 'Pull', 'G84', 'G97', 'QUV', 'Flex', 'Washing', '3M TEST', 'HF-welding'];
     const RFC_CHECK_KEYS = ['BPFC', 'PTRSS', '본딩', 'LAB TEST REPORT', 'Product exception', '미등록 MCS 없음'];
 
-    // 초기 샘플 데이터셋 (자료 아카이브 attachments 배열 포함)
+    // 초기 샘플 데이터셋
     const INITIAL_MODELS = [
       {
         id: 'm1',
@@ -697,7 +722,7 @@
             docType: 'BPFC',
             fileName: 'AM90_SPA_Bottom_Process_Flow.pdf',
             fileSize: '1.2 MB',
-            fileData: '',
+            linkUrl: '',
             uploadedAt: '2026-09-28 14:20',
             engineer: '김과장'
           },
@@ -707,7 +732,7 @@
             docType: '본딩 결과',
             fileName: 'SPA_Bonding_Peel_Test_HY.xlsx',
             fileSize: '450 KB',
-            fileData: '',
+            linkUrl: '',
             uploadedAt: '2026-09-29 10:15',
             engineer: '김과장'
           }
@@ -740,7 +765,7 @@
             docType: 'NPI 자료',
             fileName: 'Pegasus42_Pilot_Run_NPI_Summary.pdf',
             fileSize: '3.1 MB',
-            fileData: '',
+            linkUrl: '',
             uploadedAt: '2026-09-30 09:40',
             engineer: '이선임'
           }
@@ -779,6 +804,9 @@
     let searchQuery = '';
     let currentView = 'table';
     let selectedModelId = null;
+
+    // 세션 메모리 파일 저장소 (용량 제한 없이 로컬 다운로드 지원)
+    const sessionFileStore = new Map();
 
     function getFailedLabTests(model) {
       if (!model || !model.labTests) return [];
@@ -826,30 +854,50 @@
       syncBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Local Cache Mode';
       syncBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1';
       
-      const stored = localStorage.getItem('nike_dev_models_v16');
+      const stored = localStorage.getItem('nike_dev_models_v17');
       if (stored) {
         try { models = JSON.parse(stored); } catch(e) { models = INITIAL_MODELS; }
       } else {
         models = INITIAL_MODELS;
-        localStorage.setItem('nike_dev_models_v16', JSON.stringify(models));
+        localStorage.setItem('nike_dev_models_v17', JSON.stringify(models));
       }
       updateEngineerOptions();
       renderDashboard();
     }
 
+    // Firestore 1MB 제한 극복: Base64 바이너리를 제외한 메타데이터만 동기화
     async function saveModelData(model) {
       if (isFirebaseReady && db) {
         try {
-          await setDoc(doc(db, "footwear_models", model.id), model);
+          // Firestore 저장용 복사본 생성 (바이너리 필드 제외하여 1MB 에러 원천 차단)
+          const sanitized = JSON.parse(JSON.stringify(model));
+          if (sanitized.attachments) {
+            sanitized.attachments.forEach(att => {
+              delete att.fileData; // 바이너리 제거
+            });
+          }
+          await setDoc(doc(db, "footwear_models", sanitized.id), sanitized);
           return;
         } catch (e) {
           console.error("클라우드 저장 실패, 로컬에 저장:", e);
         }
       }
+      
+      // 로컬스토리지 저장 시에도 바이너리를 제외하고 저장 (5MB Quota 초과 방지)
       const idx = models.findIndex(m => m.id === model.id);
       if (idx !== -1) models[idx] = model;
       else models.unshift(model);
-      localStorage.setItem('nike_dev_models_v16', JSON.stringify(models));
+
+      try {
+        const localClean = JSON.parse(JSON.stringify(models));
+        localClean.forEach(m => {
+          if (m.attachments) m.attachments.forEach(att => delete att.fileData);
+        });
+        localStorage.setItem('nike_dev_models_v17', JSON.stringify(localClean));
+      } catch (err) {
+        console.warn("로컬스토리지 저장 실패:", err);
+      }
+      
       updateEngineerOptions();
       renderDashboard();
     }
@@ -864,7 +912,7 @@
         }
       }
       models = models.filter(m => m.id !== modelId);
-      localStorage.setItem('nike_dev_models_v16', JSON.stringify(models));
+      localStorage.setItem('nike_dev_models_v17', JSON.stringify(models));
       updateEngineerOptions();
       renderDashboard();
     }
@@ -954,7 +1002,7 @@
       container.innerHTML = html;
     }
 
-    // 6. 필터링 함수 (첨부 문서명 검색 매칭 포함)
+    // 6. 필터링 함수
     function getFilteredModels() {
       return models.filter(m => {
         if (currentCategory !== 'ALL' && m.category !== currentCategory) return false;
@@ -976,7 +1024,6 @@
           const fails = getFailedLabTests(m);
           const matchFail = fails.some(f => f.toLowerCase().includes(q));
 
-          // 첨부된 문서명 검색 매칭
           const matchDoc = (m.attachments || []).some(att => 
             (att.fileName || '').toLowerCase().includes(q) || 
             (att.docType || '').toLowerCase().includes(q)
@@ -1134,7 +1181,7 @@
       });
     }
 
-    // 9. 테이블 뷰 렌더링 (첨부자료 개수 뱃지 📎 표시)
+    // 9. 테이블 뷰 렌더링
     function renderTableView() {
       const tbody = document.getElementById('modelsTableBody');
       const filtered = getFilteredModels();
@@ -1221,7 +1268,6 @@
           ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-teal-50 text-teal-700 border border-teal-200">공유 완료</span>'
           : '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-400">미공유</span>';
 
-        // 첨부자료 개수 배지
         const attCount = (m.attachments || []).length;
         const attBadgeHtml = attCount > 0 
           ? `<span class="px-1.5 py-0.2 rounded font-bold text-[10px] bg-blue-50 text-blue-700 border border-blue-200">📎 자료 ${attCount}</span>`
@@ -1435,6 +1481,31 @@
       }
     };
 
+    // 첨부 탭 전환 함수 (파일 vs 링크)
+    let currentAttachMode = 'file';
+    window.switchAttachmentTab = function(mode) {
+      currentAttachMode = mode;
+      const fileBtn = document.getElementById('tabUploadFileBtn');
+      const linkBtn = document.getElementById('tabUploadLinkBtn');
+      const fileSec = document.getElementById('sectionAttachFile');
+      const linkSec = document.getElementById('sectionAttachLink');
+      const helpText = document.getElementById('uploadHelpText');
+
+      if (mode === 'file') {
+        fileBtn.className = "flex-1 py-1 rounded bg-white shadow-sm text-blue-700 text-center transition-all";
+        linkBtn.className = "flex-1 py-1 rounded text-slate-600 hover:text-slate-900 text-center transition-all";
+        fileSec.classList.remove('hidden');
+        linkSec.classList.add('hidden');
+        helpText.textContent = "* 대용량 보고서는 Teams/SharePoint 링크 등록을 권장합니다.";
+      } else {
+        linkBtn.className = "flex-1 py-1 rounded bg-white shadow-sm text-blue-700 text-center transition-all";
+        fileBtn.className = "flex-1 py-1 rounded text-slate-600 hover:text-slate-900 text-center transition-all";
+        linkSec.classList.remove('hidden');
+        fileSec.classList.add('hidden');
+        helpText.textContent = "* 사내 Teams 또는 SharePoint 파일 링크를 등록하면 원본으로 즉시 이동합니다.";
+      }
+    };
+
     // 12. 세부 스펙 드로어 로직
     window.openDrawer = function(modelId) {
       selectedModelId = modelId;
@@ -1484,9 +1555,12 @@
       document.getElementById('drawerMidsoleMcs').value = m.midsoleMcs || MIDSOLE_MCS_LIST[0];
       document.getElementById('drawerOutsoleMcs').value = m.outsoleMcs || OUTSOLE_MCS_LIST[0];
 
-      // 업로드 라운드 기본값을 현재 모델의 단계로 세팅
+      // 업로드 라운드 기본값 설정
       document.getElementById('uploadRound').value = m.stage;
       document.getElementById('uploadFileInput').value = '';
+      document.getElementById('uploadLinkTitle').value = '';
+      document.getElementById('uploadLinkUrl').value = '';
+      window.switchAttachmentTab('file');
 
       const npiSection = document.getElementById('drawerNpiSection');
       const npiActive = document.getElementById('npiActiveContent');
@@ -1511,7 +1585,7 @@
 
       renderDrawerLabTests(m);
       renderDrawerRfcChecklist(m);
-      renderDrawerAttachments(m); // 첨부파일 목록 렌더링
+      renderDrawerAttachments(m);
       document.getElementById('drawerGeneralNotes').value = m.generalNotes || '';
 
       const backdrop = document.getElementById('detailDrawerBackdrop');
@@ -1589,7 +1663,7 @@
       document.getElementById('drawerRfcSummary').textContent = `${passCount} / ${RFC_CHECK_KEYS.length} 요건 충족`;
     }
 
-    // [신규 기능] 라운드별 첨부파일 목록 렌더링
+    // 첨부파일 목록 렌더링
     function renderDrawerAttachments(m) {
       const listContainer = document.getElementById('drawerAttachmentList');
       const countBadge = document.getElementById('drawerAttachmentCount');
@@ -1598,31 +1672,49 @@
       countBadge.textContent = `${atts.length}건`;
 
       if (atts.length === 0) {
-        listContainer.innerHTML = '<div class="text-center py-4 text-slate-400 text-xs">등록된 라운드별 첨부자료가 없습니다.</div>';
+        listContainer.innerHTML = '<div class="text-center py-5 text-slate-400 text-xs">등록된 라운드별 첨부자료가 없습니다.</div>';
         return;
       }
 
       let html = '';
       atts.forEach(att => {
+        const isLink = !!att.linkUrl;
+        const memoryBlob = sessionFileStore.get(att.id);
+
+        let actionBtnHtml = '';
+        if (isLink) {
+          actionBtnHtml = `
+            <a href="${att.linkUrl}" target="_blank" rel="noopener noreferrer" class="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 text-[11px] font-bold flex items-center gap-1" title="링크 열기">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+              <span>열기</span>
+            </a>
+          `;
+        } else if (memoryBlob) {
+          actionBtnHtml = `
+            <a href="${memoryBlob}" download="${att.fileName}" class="px-2 py-1 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[11px] font-bold flex items-center gap-1" title="다운로드">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>다운</span>
+            </a>
+          `;
+        } else {
+          actionBtnHtml = `<span class="text-[10px] text-slate-400 font-medium px-1.5 py-0.5 rounded bg-slate-100">등록 완료</span>`;
+        }
+
         html += `
           <div class="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 flex items-center justify-between transition-colors">
             <div class="flex items-center gap-2 min-w-0">
               <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white shrink-0">${att.round}</span>
               <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700 shrink-0">${att.docType}</span>
               <div class="truncate">
-                <p class="font-bold text-xs text-slate-800 truncate" title="${att.fileName}">${att.fileName}</p>
-                <p class="text-[10px] text-slate-400 font-mono">${att.fileSize} • ${att.uploadedAt} • ${att.engineer || '담당자'}</p>
+                <p class="font-bold text-xs text-slate-800 truncate" title="${att.fileName}">
+                  ${isLink ? '🔗 ' : '📄 '}${att.fileName}
+                </p>
+                <p class="text-[10px] text-slate-400 font-mono">${att.fileSize || '웹 링크'} • ${att.uploadedAt} • ${att.engineer || '담당자'}</p>
               </div>
             </div>
-            <div class="flex items-center gap-1 shrink-0 ml-2">
-              ${att.fileData ? `
-                <a href="${att.fileData}" download="${att.fileName}" class="p-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold flex items-center gap-0.5" title="파일 다운로드">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                </a>
-              ` : `
-                <span class="text-[10px] text-slate-400 font-medium">참조문서</span>
-              `}
-              <button onclick="window.handleDeleteAttachment('${att.id}')" class="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="자료 삭제">
+            <div class="flex items-center gap-1.5 shrink-0 ml-2">
+              ${actionBtnHtml}
+              <button type="button" onclick="window.handleDeleteAttachment('${att.id}')" class="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="자료 삭제">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
               </button>
             </div>
@@ -1633,59 +1725,98 @@
       listContainer.innerHTML = html;
     }
 
-    // [신규 기능] 파일 업로드 핸들러
-    window.handleUploadAttachment = function() {
+    // [완벽한 업로드 핸들러] 파일 직접 첨부 & 링크 등록 지원
+    window.handleUploadAttachment = async function() {
       const m = models.find(item => item.id === selectedModelId);
-      if (!m) return;
-
-      const round = document.getElementById('uploadRound').value;
-      const docType = document.getElementById('uploadDocType').value;
-      const fileInput = document.getElementById('uploadFileInput');
-
-      if (!fileInput.files || fileInput.files.length === 0) {
-        alert("업로드할 파일을 선택해 주세요 (PDF, Excel, 이미지 등).");
+      if (!m) {
+        alert("선택된 모델이 없습니다.");
         return;
       }
 
-      const file = fileInput.files[0];
-      const fileSize = (file.size / (1024 * 1024) >= 1) 
-        ? (file.size / (1024 * 1024)).toFixed(1) + " MB" 
-        : Math.round(file.size / 1024) + " KB";
+      const round = document.getElementById('uploadRound').value;
+      const docType = document.getElementById('uploadDocType').value;
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const attId = 'att_' + Date.now();
 
-      const reader = new FileReader();
-      reader.onload = async function(e) {
-        const fileData = e.target.result;
-        const now = new Date();
-        const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      if (currentAttachMode === 'link') {
+        // [모드 B: 클라우드/팀즈 링크 등록]
+        const linkTitle = document.getElementById('uploadLinkTitle').value.trim();
+        const linkUrl = document.getElementById('uploadLinkUrl').value.trim();
 
-        const newAttachment = {
-          id: 'att_' + Date.now(),
+        if (!linkUrl) {
+          alert("Teams/SharePoint 링크 URL을 입력해 주세요.");
+          return;
+        }
+
+        const newAtt = {
+          id: attId,
           round: round,
           docType: docType,
-          fileName: file.name,
-          fileSize: fileSize,
-          fileData: fileData,
+          fileName: linkTitle || `${docType} 클라우드 문서`,
+          fileSize: 'Teams 링크',
+          linkUrl: linkUrl,
           uploadedAt: dateStr,
           engineer: m.engineer || 'CE 엔지니어'
         };
 
         if (!m.attachments) m.attachments = [];
-        m.attachments.unshift(newAttachment);
+        m.attachments.unshift(newAtt);
+
+        await saveModelData(m);
+        renderDrawerAttachments(m);
+        document.getElementById('uploadLinkTitle').value = '';
+        document.getElementById('uploadLinkUrl').value = '';
+        alert("링크 자료가 성공적으로 등록되었습니다!");
+      } else {
+        // [모드 A: 파일 직접 첨부]
+        const fileInput = document.getElementById('uploadFileInput');
+        if (!fileInput.files || fileInput.files.length === 0) {
+          alert("업로드할 파일을 선택해 주세요.");
+          return;
+        }
+
+        const file = fileInput.files[0];
+        const fileSize = (file.size / (1024 * 1024) >= 1) 
+          ? (file.size / (1024 * 1024)).toFixed(1) + " MB" 
+          : Math.round(file.size / 1024) + " KB";
+
+        // 세션 메모리에 ObjectURL 생성 (용량 제한 없이 로컬 다운로드 가능)
+        const blobUrl = URL.createObjectURL(file);
+        sessionFileStore.set(attId, blobUrl);
+
+        const newAtt = {
+          id: attId,
+          round: round,
+          docType: docType,
+          fileName: file.name,
+          fileSize: fileSize,
+          linkUrl: '',
+          uploadedAt: dateStr,
+          engineer: m.engineer || 'CE 엔지니어'
+        };
+
+        if (!m.attachments) m.attachments = [];
+        m.attachments.unshift(newAtt);
 
         await saveModelData(m);
         renderDrawerAttachments(m);
         fileInput.value = '';
-      };
-
-      reader.readAsDataURL(file);
+        alert(`'${file.name}' 자료가 성공적으로 등록되었습니다!`);
+      }
     };
 
-    // [신규 기능] 파일 삭제 핸들러
+    // [완벽한 삭제 핸들러]
     window.handleDeleteAttachment = async function(attId) {
       const m = models.find(item => item.id === selectedModelId);
       if (!m || !m.attachments) return;
 
-      if (window.confirm("이 첨부자료를 삭제하시겠습니까?")) {
+      if (window.confirm("정말로 이 첨부 자료를 삭제하시겠습니까?")) {
+        // 메모리 해제
+        if (sessionFileStore.has(attId)) {
+          URL.revokeObjectURL(sessionFileStore.get(attId));
+          sessionFileStore.delete(attId);
+        }
         m.attachments = m.attachments.filter(att => att.id !== attId);
         await saveModelData(m);
         renderDrawerAttachments(m);
@@ -1830,7 +1961,7 @@
         labTests: initialLabTests,
         rfcChecks: initialRfcChecks,
         generalNotes: '',
-        attachments: [] // 빈 첨부파일 리스트 생성
+        attachments: []
       };
 
       await saveModelData(newModel);

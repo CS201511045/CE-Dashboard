@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Nike Footwear Development Status Board (SharePoint Enterprise Mode)</title>
+  <title>Footwear Development Status Board (SharePoint On-Premise)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap');
@@ -43,10 +43,10 @@
             FOOTWEAR DEV DASHBOARD
             <span id="syncStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-              SharePoint On-Premise Sync
+              SharePoint Sync Ready
             </span>
           </h1>
-          <p class="text-xs text-neutral-400">사내 전용 SharePoint 데이터베이스 연동 | 보안 규정 100% 준수</p>
+          <p class="text-xs text-neutral-400">사내 SharePoint 연동 모드 | 보안 규정 100% 준수</p>
         </div>
       </div>
 
@@ -393,13 +393,13 @@
             </div>
             <div>
               <label class="text-[10px] text-slate-500 font-bold block mb-0.5">사내 SharePoint / Teams 파일 링크 URL</label>
-              <input type="url" id="uploadLinkUrl" placeholder="https://회사명.sharepoint.com/..." class="w-full bg-white border border-slate-200 rounded p-1.5 text-xs font-mono text-blue-700">
+              <input type="url" id="uploadLinkUrl" placeholder="https://changshininc-my.sharepoint.com/..." class="w-full bg-white border border-slate-200 rounded p-1.5 text-xs font-mono text-blue-700">
             </div>
           </div>
 
           <div class="flex items-center justify-between pt-1">
             <span class="text-[10px] text-slate-400">* 사내 SharePoint에 업로드된 링크를 등록하면 권한자만 안전하게 열람합니다.</span>
-            <button type="button" onclick="window.handleUploadAttachment()" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold text-xs shadow-sm flex items-center gap-1 transition-all">
+            <button type="button" onclick="handleUploadAttachment()" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold text-xs shadow-sm flex items-center gap-1 transition-all">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
               자료 등록하기
             </button>
@@ -605,17 +605,19 @@
     </div>
   </div>
 
-  <!-- 사내 SharePoint REST API 엔진 -->
+  <!-- 사내 SharePoint 전용 REST 통신 스크립트 -->
   <script>
     // =========================================================================
-    // [사내 SharePoint 환경 설정]
-    // 회사 SharePoint 사이트의 URL을 지정해 주시면 해당 List와 100% 동기화됩니다.
+    // [공유해 주신 실제 SharePoint 주소로 100% 매핑된 설정]
     // =========================================================================
     const SHAREPOINT_CONFIG = {
-      // 현재 Teams/SharePoint 사이트의 상대 주소 또는 절대 주소
-      // 예: "/sites/CE-Footwear" 또는 "" (현재 호스팅된 사이트 루트)
-      siteUrl: window.location.pathname.includes("/sites/") ? window.location.pathname.split("/SitePages")[0] : "",
-      listTitle: "FootwearModels", // 사내 SharePoint에 생성할 List 이름
+      // 1. SharePoint 개인 사이트 루트 상대 주소
+      siteUrl: "/personal/jaehong_kim_dskorea_com",
+      
+      // 2. 사내 List 이름
+      listTitle: "FootwearModels",
+      
+      // 3. 실행 환경 판별 (도메인 감지)
       isSharePointEnv: window.location.hostname.includes("sharepoint.com")
     };
 
@@ -721,7 +723,7 @@
       }));
     }
 
-    // SharePoint Digest 토큰 획득
+    // SharePoint 토큰 획득
     async function getSharePointFormDigest() {
       try {
         const res = await fetch(`${SHAREPOINT_CONFIG.siteUrl}/_api/contextinfo`, {
@@ -735,7 +737,7 @@
       }
     }
 
-    // SharePoint List 통신 모듈
+    // SharePoint List 데이터 동기화 초기화
     async function initSharePointSync() {
       populateOptions();
       renderCategoryTabs();
@@ -752,7 +754,7 @@
           if (items && items.length > 0) {
             models = items.map(it => {
               const parsed = JSON.parse(it.ModelData);
-              parsed._spId = it.Id; // SharePoint 고유 ID 보존
+              parsed._spId = it.Id;
               return parsed;
             });
           } else {
@@ -761,7 +763,7 @@
           badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> SharePoint On-Premise Active';
           badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 flex items-center gap-1';
         } catch (err) {
-          console.warn("SharePoint 목록 접근 불가, 사내 로컬 저장소 모드로 작동합니다:", err);
+          console.warn("SharePoint List 통신 대기 (로컬 백업 모드 실행):", err);
           fallbackToLocalStorage();
         }
       } else {
@@ -789,7 +791,6 @@
       if (idx !== -1) models[idx] = model;
       else models.unshift(model);
 
-      // SharePoint List 저장
       if (SHAREPOINT_CONFIG.isSharePointEnv) {
         try {
           const digest = await getSharePointFormDigest();
@@ -800,7 +801,6 @@
           };
 
           if (model._spId) {
-            // 업데이트 (MERGE)
             await fetch(`${SHAREPOINT_CONFIG.siteUrl}/_api/web/lists/getbytitle('${SHAREPOINT_CONFIG.listTitle}')/items(${model._spId})`, {
               method: "POST",
               headers: {
@@ -813,7 +813,6 @@
               body: JSON.stringify(payload)
             });
           } else {
-            // 신규 생성 (POST)
             const createdRes = await fetch(`${SHAREPOINT_CONFIG.siteUrl}/_api/web/lists/getbytitle('${SHAREPOINT_CONFIG.listTitle}')/items`, {
               method: "POST",
               headers: {
@@ -827,7 +826,7 @@
             model._spId = createdData.d.Id;
           }
         } catch (e) {
-          console.warn("SharePoint 저장 실패, 로컬 백업 유지:", e);
+          console.warn("SharePoint 저장 중 오류 발생 (로컬 스토리지 보존):", e);
         }
       }
 
@@ -1804,7 +1803,7 @@
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(models, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `nike_sharepoint_backup_${new Date().toISOString().slice(0,10)}.json`);
+      downloadAnchor.setAttribute("download", `footwear_sharepoint_backup_${new Date().toISOString().slice(0,10)}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();

@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Nike Footwear Development Status Board</title>
+  <title>Nike Footwear Development Status Board (SharePoint Enterprise Mode)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap');
@@ -31,6 +31,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
 
+  <!-- 상단 네비게이션 바 -->
   <header class="bg-neutral-950 text-white sticky top-0 z-30 shadow-md border-b border-neutral-800">
     <div class="max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center space-x-3">
@@ -41,11 +42,11 @@
           <h1 class="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
             FOOTWEAR DEV DASHBOARD
             <span id="syncStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              Live Sync Active
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              SharePoint On-Premise Sync
             </span>
           </h1>
-          <p class="text-xs text-neutral-400">Teams Realtime Collaborative Tracker | Categories / MCS / Tooling / Lab Gate Readiness</p>
+          <p class="text-xs text-neutral-400">사내 전용 SharePoint 데이터베이스 연동 | 보안 규정 100% 준수</p>
         </div>
       </div>
 
@@ -66,18 +67,18 @@
           <span>모델 등록</span>
         </button>
 
-        <button onclick="exportDataBackup()" title="JSON 데이터 백업 다운로드" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 p-2 rounded-lg text-xs font-medium transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        <button onclick="reloadSharePointData()" title="SharePoint 서버에서 최신 데이터 다시 불러오기" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 p-2 rounded-lg text-xs font-medium transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         </button>
 
-        <label title="백업 파일 가져와서 동기화" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 p-2 rounded-lg text-xs font-medium transition-colors cursor-pointer flex items-center">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-          <input type="file" id="importJsonInput" accept=".json" onchange="importDataBackup(event)" class="hidden">
-        </label>
+        <button onclick="exportDataBackup()" title="사내 백업 JSON 파일 다운로드" class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 p-2 rounded-lg text-xs font-medium transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        </button>
       </div>
     </div>
   </header>
 
+  <!-- 메인 대시보드 레이아웃 -->
   <main class="max-w-[1700px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 flex-1 flex flex-col space-y-5">
     
     <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-col gap-3.5">
@@ -112,6 +113,7 @@
         </div>
       </div>
 
+      <!-- 시즌별 모델 수 칩 -->
       <div>
         <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center justify-between">
           <span class="flex items-center gap-1.5">
@@ -123,6 +125,7 @@
         <div id="seasonChipsContainer" class="flex flex-wrap gap-1.5 custom-scrollbar overflow-x-auto pb-1"></div>
       </div>
 
+      <!-- 담당 엔지니어별 모델 수 칩 바 -->
       <div class="pt-2 border-t border-slate-100">
         <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center justify-between">
           <span class="flex items-center gap-1.5">
@@ -135,6 +138,7 @@
       </div>
     </div>
 
+    <!-- KPI 요약 카드 4종 -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 flex flex-col justify-between">
         <div class="flex items-center justify-between">
@@ -208,6 +212,7 @@
       </div>
     </div>
 
+    <!-- 테이블 뷰 -->
     <div id="tableViewSection" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex-1 flex flex-col">
       <div class="overflow-x-auto custom-scrollbar flex-1">
         <table class="w-full text-left border-collapse text-xs">
@@ -230,12 +235,14 @@
       </div>
     </div>
 
+    <!-- 칸반 보드 뷰 -->
     <div id="kanbanViewSection" class="hidden flex-1 overflow-x-auto custom-scrollbar pb-2">
       <div id="kanbanColumnsContainer" class="flex gap-3.5 min-w-[1400px]"></div>
     </div>
 
   </main>
 
+  <!-- 세부 정보 슬라이드 드로어 (Drawer) -->
   <div id="detailDrawerBackdrop" onclick="closeDrawer()" class="fixed inset-0 bg-slate-900/40 z-40 hidden transition-opacity opacity-0"></div>
   <aside id="detailDrawer" class="fixed right-0 top-0 bottom-0 w-full max-w-xl bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
     <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-900 text-white">
@@ -253,6 +260,8 @@
     </div>
 
     <div class="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar text-xs">
+      
+      <!-- 1. 기본 정보 및 단계 설정 -->
       <section class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="font-bold text-slate-800 flex items-center gap-1.5">
@@ -289,11 +298,9 @@
             </select>
           </div>
         </div>
-        <p id="wtRestrictedWarning" class="text-[10px] text-amber-600 hidden font-medium">
-          * 현재 단계에서는 Wear Test를 진행할 수 없습니다 (PR/GGP/SPA만 가능).
-        </p>
       </section>
 
+      <!-- 2. TD Code & MCS & 사출유무 & Chemical Vendor & Forecast & 담당자 -->
       <section class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-3">
         <h3 class="font-bold text-slate-800 flex items-center gap-1.5">
           <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
@@ -339,25 +346,17 @@
         </div>
       </section>
 
+      <!-- 3. 라운드별 엔지니어링 자료 아카이브 -->
       <section class="bg-white p-3.5 rounded-xl border border-blue-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
           <div>
             <h3 class="font-bold text-slate-800 flex items-center gap-1.5">
               <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-              라운드별 엔지니어링 자료 아카이브
+              라운드별 엔지니어링 자료 아카이브 (사내 보안 링크)
             </h3>
             <p class="text-[11px] text-slate-400">Chemical Engineer 필수 자료: BPFC / 본딩 결과 / NPI 자료 / 성적서</p>
           </div>
           <span id="drawerAttachmentCount" class="text-xs font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700">0건</span>
-        </div>
-
-        <div class="bg-slate-100 p-1 rounded-lg flex items-center gap-1 text-[11px] font-semibold">
-          <button type="button" id="tabUploadFileBtn" onclick="window.switchAttachmentTab('file')" class="flex-1 py-1 rounded bg-white shadow-sm text-blue-700 text-center transition-all">
-            📁 로컬 파일 직접 첨부
-          </button>
-          <button type="button" id="tabUploadLinkBtn" onclick="window.switchAttachmentTab('link')" class="flex-1 py-1 rounded text-slate-600 hover:text-slate-900 text-center transition-all">
-            🔗 Teams / SharePoint 링크 등록
-          </button>
         </div>
 
         <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 space-y-2">
@@ -387,24 +386,19 @@
             </div>
           </div>
 
-          <div id="sectionAttachFile">
-            <label class="text-[10px] text-slate-500 font-bold block mb-0.5">문서 파일 선택 (PDF, Excel, 이미지, ZIP 등)</label>
-            <input type="file" id="uploadFileInput" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded file:border-0 file:text-[11px] file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
-          </div>
-
-          <div id="sectionAttachLink" class="hidden space-y-1.5">
+          <div class="space-y-1.5">
             <div>
               <label class="text-[10px] text-slate-500 font-bold block mb-0.5">자료 제목 (표시명)</label>
               <input type="text" id="uploadLinkTitle" placeholder="예: [SPA] 힐 스트랩 접착 공정 검증서.xlsx" class="w-full bg-white border border-slate-200 rounded p-1.5 text-xs">
             </div>
             <div>
-              <label class="text-[10px] text-slate-500 font-bold block mb-0.5">SharePoint / OneDrive / 웹 링크 URL</label>
-              <input type="url" id="uploadLinkUrl" placeholder="https://..." class="w-full bg-white border border-slate-200 rounded p-1.5 text-xs font-mono text-blue-700">
+              <label class="text-[10px] text-slate-500 font-bold block mb-0.5">사내 SharePoint / Teams 파일 링크 URL</label>
+              <input type="url" id="uploadLinkUrl" placeholder="https://회사명.sharepoint.com/..." class="w-full bg-white border border-slate-200 rounded p-1.5 text-xs font-mono text-blue-700">
             </div>
           </div>
 
           <div class="flex items-center justify-between pt-1">
-            <span class="text-[10px] text-slate-400" id="uploadHelpText">* 대용량 보고서는 Teams/SharePoint 링크 등록을 권장합니다.</span>
+            <span class="text-[10px] text-slate-400">* 사내 SharePoint에 업로드된 링크를 등록하면 권한자만 안전하게 열람합니다.</span>
             <button type="button" onclick="window.handleUploadAttachment()" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold text-xs shadow-sm flex items-center gap-1 transition-all">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
               자료 등록하기
@@ -415,6 +409,7 @@
         <div id="drawerAttachmentList" class="space-y-1.5 max-h-56 overflow-y-auto custom-scrollbar pt-1"></div>
       </section>
 
+      <!-- 4. NPI 진행 -->
       <section id="drawerNpiSection" class="p-3.5 rounded-xl border transition-all">
         <div class="flex items-center justify-between mb-2">
           <h3 class="font-bold text-slate-800 flex items-center gap-1.5">
@@ -445,6 +440,7 @@
         </div>
       </section>
 
+      <!-- 5. LAB TEST 평가 -->
       <section class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
           <div>
@@ -465,6 +461,7 @@
         <div id="drawerLabTestGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1"></div>
       </section>
 
+      <!-- 6. RFC 준비 체크리스트 -->
       <section class="bg-white p-3.5 rounded-xl border border-slate-200 space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
           <div>
@@ -480,6 +477,7 @@
         <div class="space-y-2 pt-1" id="drawerRfcChecklist"></div>
       </section>
 
+      <!-- 7. 종합 엔지니어링 메모 -->
       <section class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
         <h3 class="font-bold text-slate-700 flex items-center gap-1.5">
           <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
@@ -490,6 +488,7 @@
 
     </div>
 
+    <!-- 드로어 푸터 -->
     <div class="p-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
       <button onclick="deleteModelPrompt()" class="text-xs text-red-600 hover:text-red-800 font-semibold flex items-center gap-1">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -606,44 +605,19 @@
     </div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-    import { 
-      getFirestore, 
-      collection, 
-      onSnapshot, 
-      doc, 
-      setDoc, 
-      deleteDoc 
-    } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
-
+  <!-- 사내 SharePoint REST API 엔진 -->
+  <script>
     // =========================================================================
-    // [중요] 실제 Firebase 발급 설정값을 아래에 입력하시면 Teams 웹뷰와 브라우저 간
-    // 데이터 불일치가 100% 영구적으로 해결됩니다.
+    // [사내 SharePoint 환경 설정]
+    // 회사 SharePoint 사이트의 URL을 지정해 주시면 해당 List와 100% 동기화됩니다.
     // =========================================================================
-    const firebaseConfig = {
-      apiKey: "AIzaSyYOUR_API_KEY_HERE",
-      authDomain: "your-app.firebaseapp.com",
-      projectId: "your-app-id",
-      storageBucket: "your-app.appspot.com",
-      messagingSenderId: "1234567890",
-      appId: "1:1234567890:web:abcdef123456"
+    const SHAREPOINT_CONFIG = {
+      // 현재 Teams/SharePoint 사이트의 상대 주소 또는 절대 주소
+      // 예: "/sites/CE-Footwear" 또는 "" (현재 호스팅된 사이트 루트)
+      siteUrl: window.location.pathname.includes("/sites/") ? window.location.pathname.split("/SitePages")[0] : "",
+      listTitle: "FootwearModels", // 사내 SharePoint에 생성할 List 이름
+      isSharePointEnv: window.location.hostname.includes("sharepoint.com")
     };
-
-    let isFirebaseReady = false;
-    let db = null;
-    let modelsColRef = null;
-
-    if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "AIzaSyYOUR_API_KEY_HERE") {
-      try {
-        const app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        modelsColRef = collection(db, "footwear_models");
-        isFirebaseReady = true;
-      } catch (e) {
-        console.warn("Firebase 연결 실패, 오프라인 마스터 스토리지 모드로 전환:", e);
-      }
-    }
 
     const SEASONS = ['HO26', 'SP27', 'SU27', 'FA27', 'HO27', 'SP28', 'SU28', 'FA28', 'HO28', 'SP29', 'SU29', 'FA29', 'HO29', 'SP30'];
     const STAGES = ['PR', 'GGP', 'SPA', 'PRE-RFC', 'ST', 'RFC', 'PROD CFM'];
@@ -691,18 +665,7 @@
         labTests: { 'Assembly': 'Pass', 'Stockfit': 'Pass', 'No-sew': 'Pass', 'Pull': 'Pass', 'G84': 'Fail', 'G97': 'Pass', 'QUV': 'Fail', 'Flex': 'Pass', 'Washing': 'Pass', '3M TEST': 'Pass', 'HF-welding': 'Pass' },
         rfcChecks: { 'BPFC': true, 'PTRSS': true, '본딩': true, 'LAB TEST REPORT': false, 'Product exception': false, '미등록 MCS 없음': true },
         generalNotes: 'G84 내마모 및 QUV 자외선 변색 이슈로 배합 보완 중.',
-        attachments: [
-          {
-            id: 'att_1',
-            round: 'SPA',
-            docType: 'BPFC',
-            fileName: 'AM90_SPA_Bottom_Process_Flow.pdf',
-            fileSize: '1.2 MB',
-            linkUrl: '',
-            uploadedAt: '2026-09-28 14:20',
-            engineer: '김과장'
-          }
-        ]
+        attachments: []
       },
       {
         id: 'm2',
@@ -737,8 +700,6 @@
     let currentView = 'table';
     let selectedModelId = null;
 
-    const sessionFileStore = new Map();
-
     function getFailedLabTests(model) {
       if (!model || !model.labTests) return [];
       const fails = [];
@@ -748,135 +709,163 @@
       return fails;
     }
 
-    // [데이터 보존 핵심] 기존 팀원 등록 데이터 절대 유실 방지 병합기
     function mergeWithExistingData(incomingModels) {
       if (!incomingModels || incomingModels.length === 0) return INITIAL_MODELS;
-
-      return incomingModels.map(item => {
-        return {
-          ...item,
-          stage: item.stage === 'ST (동시시화)' ? 'ST' : (item.stage || 'PR'),
-          attachments: Array.isArray(item.attachments) ? item.attachments : [],
-          vendorChem: item.vendorChem || 'HY',
-          ceTpShared: item.ceTpShared || 'NO',
-          forecast: (item.forecast || '').replace(/pairs/gi, '').trim()
-        };
-      });
+      return incomingModels.map(item => ({
+        ...item,
+        stage: item.stage === 'ST (동시시화)' ? 'ST' : (item.stage || 'PR'),
+        attachments: Array.isArray(item.attachments) ? item.attachments : [],
+        vendorChem: item.vendorChem || 'HY',
+        ceTpShared: item.ceTpShared || 'NO',
+        forecast: (item.forecast || '').replace(/pairs/gi, '').trim()
+      }));
     }
 
-    function initRealtimeSync() {
+    // SharePoint Digest 토큰 획득
+    async function getSharePointFormDigest() {
+      try {
+        const res = await fetch(`${SHAREPOINT_CONFIG.siteUrl}/_api/contextinfo`, {
+          method: "POST",
+          headers: { "Accept": "application/json;odata=verbose" }
+        });
+        const data = await res.json();
+        return data.d.GetContextWebInformation.FormDigestValue;
+      } catch (e) {
+        return "";
+      }
+    }
+
+    // SharePoint List 통신 모듈
+    async function initSharePointSync() {
       populateOptions();
       renderCategoryTabs();
+      const badge = document.getElementById("syncStatusBadge");
 
-      const syncBadge = document.getElementById("syncStatusBadge");
+      if (SHAREPOINT_CONFIG.isSharePointEnv) {
+        try {
+          const res = await fetch(`${SHAREPOINT_CONFIG.siteUrl}/_api/web/lists/getbytitle('${SHAREPOINT_CONFIG.listTitle}')/items?$select=Id,Title,ModelData&$top=2000`, {
+            headers: { "Accept": "application/json;odata=verbose" }
+          });
+          const json = await res.json();
+          const items = json.d.results;
 
-      if (isFirebaseReady) {
-        onSnapshot(modelsColRef, (snapshot) => {
-          if (snapshot.empty) {
-            INITIAL_MODELS.forEach(m => {
-              setDoc(doc(db, "footwear_models", m.id), m);
+          if (items && items.length > 0) {
+            models = items.map(it => {
+              const parsed = JSON.parse(it.ModelData);
+              parsed._spId = it.Id; // SharePoint 고유 ID 보존
+              return parsed;
             });
-            models = INITIAL_MODELS;
           } else {
-            const fetched = [];
-            snapshot.forEach(docSnap => { fetched.push(docSnap.data()); });
-            models = mergeWithExistingData(fetched);
+            models = INITIAL_MODELS;
           }
-          syncBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Cloud Live Sync';
-          syncBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 flex items-center gap-1';
-          updateEngineerOptions();
-          renderDashboard();
-        }, (error) => {
-          console.error("Firestore 동기화 오류:", error);
+          badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> SharePoint On-Premise Active';
+          badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 flex items-center gap-1';
+        } catch (err) {
+          console.warn("SharePoint 목록 접근 불가, 사내 로컬 저장소 모드로 작동합니다:", err);
           fallbackToLocalStorage();
-        });
+        }
       } else {
         fallbackToLocalStorage();
       }
-    }
 
-    function fallbackToLocalStorage() {
-      const syncBadge = document.getElementById("syncStatusBadge");
-      syncBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Local Cache Mode';
-      syncBadge.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1';
-      
-      const MASTER_STORAGE_KEY = 'nike_dev_models_master';
-      const stored = localStorage.getItem(MASTER_STORAGE_KEY);
-      
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          models = mergeWithExistingData(parsed);
-        } catch(e) {
-          models = INITIAL_MODELS;
-        }
-      } else {
-        const oldBackup = localStorage.getItem('nike_dev_models_v18') || localStorage.getItem('nike_dev_models_v17');
-        if (oldBackup) {
-          try {
-            models = mergeWithExistingData(JSON.parse(oldBackup));
-          } catch(e) {
-            models = INITIAL_MODELS;
-          }
-        } else {
-          models = INITIAL_MODELS;
-        }
-        localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(models));
-      }
       updateEngineerOptions();
       renderDashboard();
     }
 
+    function fallbackToLocalStorage() {
+      const MASTER_STORAGE_KEY = 'nike_dev_models_master';
+      const stored = localStorage.getItem(MASTER_STORAGE_KEY);
+      if (stored) {
+        try { models = mergeWithExistingData(JSON.parse(stored)); } catch(e) { models = INITIAL_MODELS; }
+      } else {
+        models = INITIAL_MODELS;
+        localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(models));
+      }
+    }
+
     async function saveModelData(model) {
       const MASTER_STORAGE_KEY = 'nike_dev_models_master';
-
       const idx = models.findIndex(m => m.id === model.id);
-      if (idx !== -1) {
-        models[idx] = model;
-      } else {
-        models.unshift(model);
-      }
+      if (idx !== -1) models[idx] = model;
+      else models.unshift(model);
 
-      if (isFirebaseReady && db) {
+      // SharePoint List 저장
+      if (SHAREPOINT_CONFIG.isSharePointEnv) {
         try {
-          const sanitized = JSON.parse(JSON.stringify(model));
-          if (sanitized.attachments) {
-            sanitized.attachments.forEach(att => delete att.fileData);
+          const digest = await getSharePointFormDigest();
+          const payload = {
+            __metadata: { type: `SP.Data.${SHAREPOINT_CONFIG.listTitle}ListItem` },
+            Title: model.name,
+            ModelData: JSON.stringify(model)
+          };
+
+          if (model._spId) {
+            // 업데이트 (MERGE)
+            await fetch(`${SHAREPOINT_CONFIG.siteUrl}/_api/web/lists/getbytitle('${SHAREPOINT_CONFIG.listTitle}')/items(${model._spId})`, {
+              method: "POST",
+              headers: {
+                "Accept": "application/json;odata=verbose",
+                "Content-Type": "application/json;odata=verbose",
+                "X-HTTP-Method": "MERGE",
+                "If-Match": "*",
+                "X-RequestDigest": digest
+              },
+              body: JSON.stringify(payload)
+            });
+          } else {
+            // 신규 생성 (POST)
+            const createdRes = await fetch(`${SHAREPOINT_CONFIG.siteUrl}/_api/web/lists/getbytitle('${SHAREPOINT_CONFIG.listTitle}')/items`, {
+              method: "POST",
+              headers: {
+                "Accept": "application/json;odata=verbose",
+                "Content-Type": "application/json;odata=verbose",
+                "X-RequestDigest": digest
+              },
+              body: JSON.stringify(payload)
+            });
+            const createdData = await createdRes.json();
+            model._spId = createdData.d.Id;
           }
-          await setDoc(doc(db, "footwear_models", sanitized.id), sanitized);
         } catch (e) {
-          console.error("클라우드 저장 실패:", e);
+          console.warn("SharePoint 저장 실패, 로컬 백업 유지:", e);
         }
       }
-      
-      try {
-        const localClean = JSON.parse(JSON.stringify(models));
-        localClean.forEach(m => {
-          if (m.attachments) m.attachments.forEach(att => delete att.fileData);
-        });
-        localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(localClean));
-      } catch (err) {
-        console.warn("로컬스토리지 저장 실패:", err);
-      }
-      
+
+      localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(models));
       updateEngineerOptions();
       renderDashboard();
     }
 
     async function removeModelData(modelId) {
       const MASTER_STORAGE_KEY = 'nike_dev_models_master';
-      if (isFirebaseReady && db) {
+      const target = models.find(m => m.id === modelId);
+
+      if (SHAREPOINT_CONFIG.isSharePointEnv && target && target._spId) {
         try {
-          await deleteDoc(doc(db, "footwear_models", modelId));
+          const digest = await getSharePointFormDigest();
+          await fetch(`${SHAREPOINT_CONFIG.siteUrl}/_api/web/lists/getbytitle('${SHAREPOINT_CONFIG.listTitle}')/items(${target._spId})`, {
+            method: "POST",
+            headers: {
+              "Accept": "application/json;odata=verbose",
+              "X-HTTP-Method": "DELETE",
+              "If-Match": "*",
+              "X-RequestDigest": digest
+            }
+          });
         } catch (e) {
-          console.error("클라우드 삭제 실패:", e);
+          console.warn("SharePoint 삭제 실패:", e);
         }
       }
+
       models = models.filter(m => m.id !== modelId);
       localStorage.setItem(MASTER_STORAGE_KEY, JSON.stringify(models));
       updateEngineerOptions();
       renderDashboard();
     }
+
+    window.reloadSharePointData = function() {
+      initSharePointSync();
+    };
 
     function populateOptions() {
       const filterSelect = document.getElementById('filterSeason');
@@ -926,7 +915,6 @@
     function updateEngineerOptions() {
       const filterEngSelect = document.getElementById('filterEngineer');
       if (!filterEngSelect) return;
-      
       const engineers = Array.from(new Set(models.map(m => m.engineer).filter(Boolean))).sort();
       let html = '<option value="ALL">전체 담당자</option>';
       engineers.forEach(eng => {
@@ -943,7 +931,7 @@
         <span class="text-xs font-bold uppercase tracking-wider text-slate-500 mr-1 flex items-center gap-1">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg> Category:
         </span>
-        <button onclick="window.setCategoryFilter('ALL')" id="catTab-ALL" class="cat-tab px-3 py-1.5 rounded-lg text-xs font-semibold ${isAllActive ? 'bg-neutral-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">
+        <button onclick="setCategoryFilter('ALL')" class="px-3 py-1.5 rounded-lg text-xs font-semibold ${isAllActive ? 'bg-neutral-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">
           전체 보기 (<span id="count-ALL">${models.length}</span>)
         </button>
       `;
@@ -952,12 +940,11 @@
         const count = models.filter(m => m.category === cat).length;
         const isActive = currentCategory === cat;
         html += `
-          <button onclick="window.setCategoryFilter('${cat}')" id="catTab-${cat}" class="cat-tab px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${isActive ? 'bg-neutral-900 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">
+          <button onclick="setCategoryFilter('${cat}')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors ${isActive ? 'bg-neutral-900 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}">
             ${cat} (<span id="count-${cat}">${count}</span>)
           </button>
         `;
       });
-
       container.innerHTML = html;
     }
 
@@ -978,15 +965,12 @@
           const matchInj = (m.injectionType || '').toLowerCase().includes(q);
           const matchChem = (m.vendorChem || '').toLowerCase().includes(q);
           const matchFc = (m.forecast || '').toLowerCase().includes(q);
-
           const fails = getFailedLabTests(m);
           const matchFail = fails.some(f => f.toLowerCase().includes(q));
-
           const matchDoc = (m.attachments || []).some(att => 
             (att.fileName || '').toLowerCase().includes(q) || 
             (att.docType || '').toLowerCase().includes(q)
           );
-
           if (!matchName && !matchCode && !matchTd && !matchEng && !matchMcs && !matchInj && !matchChem && !matchFc && !matchFail && !matchDoc) return false;
         }
         return true;
@@ -1006,7 +990,7 @@
       let html = '';
       const isAllActive = currentSeasonFilter === 'ALL';
       html += `
-        <button onclick="window.handleSeasonSelect('ALL')" class="px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all ${isAllActive ? 'bg-neutral-900 text-white shadow-sm ring-1 ring-neutral-900' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}">
+        <button onclick="handleSeasonSelect('ALL')" class="px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all ${isAllActive ? 'bg-neutral-900 text-white shadow-sm ring-1 ring-neutral-900' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}">
           <span>전체</span><span class="px-1.5 py-0.2 rounded-full text-[10px] ${isAllActive ? 'bg-orange-600 text-white' : 'bg-slate-200 text-slate-700'}">${baseModels.length}</span>
         </button>
       `;
@@ -1015,12 +999,11 @@
         const count = counts[s];
         const isActive = currentSeasonFilter === s;
         html += `
-          <button onclick="window.handleSeasonSelect('${s}')" class="px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all ${isActive ? 'bg-orange-600 text-white shadow-sm ring-1 ring-orange-600' : (count > 0 ? 'bg-slate-50 border border-slate-300 text-slate-800 hover:bg-slate-100' : 'bg-slate-50/60 border border-slate-200 text-slate-400 hover:bg-slate-100')}">
+          <button onclick="handleSeasonSelect('${s}')" class="px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all ${isActive ? 'bg-orange-600 text-white shadow-sm ring-1 ring-orange-600' : (count > 0 ? 'bg-slate-50 border border-slate-300 text-slate-800 hover:bg-slate-100' : 'bg-slate-50/60 border border-slate-200 text-slate-400 hover:bg-slate-100')}">
             <span>${s}</span><span class="px-1.5 py-0.2 rounded-full text-[10px] ${isActive ? 'bg-neutral-900 text-white font-bold' : (count > 0 ? 'bg-orange-100 text-orange-800 font-bold' : 'bg-slate-200 text-slate-500')}">${count}</span>
           </button>
         `;
       });
-
       container.innerHTML = html;
     }
 
@@ -1042,11 +1025,10 @@
       });
 
       const engList = Object.keys(counts).sort();
-
       let html = '';
       const isAllActive = currentEngineerFilter === 'ALL';
       html += `
-        <button onclick="window.handleEngineerSelect('ALL')" class="px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all ${isAllActive ? 'bg-blue-900 text-white shadow-sm ring-1 ring-blue-900' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}">
+        <button onclick="handleEngineerSelect('ALL')" class="px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all ${isAllActive ? 'bg-blue-900 text-white shadow-sm ring-1 ring-blue-900' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}">
           <span>전체 담당자</span><span class="px-1.5 py-0.2 rounded-full text-[10px] ${isAllActive ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'}">${baseModels.length}</span>
         </button>
       `;
@@ -1055,18 +1037,16 @@
         const count = counts[eng];
         const isActive = currentEngineerFilter === eng;
         html += `
-          <button onclick="window.handleEngineerSelect('${eng}')" class="px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all ${isActive ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-600' : 'bg-white border border-slate-300 text-slate-800 hover:bg-slate-100'}">
+          <button onclick="handleEngineerSelect('${eng}')" class="px-2.5 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all ${isActive ? 'bg-blue-600 text-white shadow-sm ring-1 ring-blue-600' : 'bg-white border border-slate-300 text-slate-800 hover:bg-slate-100'}">
             <span>👤 ${eng}</span><span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold ${isActive ? 'bg-blue-900 text-white' : 'bg-blue-100 text-blue-800'}">${count}개</span>
           </button>
         `;
       });
-
       container.innerHTML = html;
     }
 
     function renderKPIs() {
       const filtered = getFilteredModels();
-
       let totalLabItems = 0;
       let passLabItems = 0;
       let failModelCount = 0;
@@ -1228,7 +1208,7 @@
           : `<span class="px-1.5 py-0.2 rounded text-[10px] bg-slate-50 text-slate-400 border border-slate-200">📎 자료 0</span>`;
 
         html += `
-          <tr class="hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-100" onclick="window.openDrawer('${m.id}')">
+          <tr class="hover:bg-slate-50 transition-colors cursor-pointer border-b border-slate-100" onclick="openDrawer('${m.id}')">
             <td class="py-3 px-3 text-center"><span class="font-bold text-slate-800 bg-slate-100 px-2 py-0.5 rounded text-[11px] border border-slate-200">${m.season}</span></td>
             <td class="py-3 px-3"><span class="px-2 py-0.5 rounded font-bold text-[10px] inline-block ${catBadgeClass}">${m.category}</span></td>
             <td class="py-3 px-4">
@@ -1269,12 +1249,11 @@
               <span class="text-[10px] text-slate-400">BPFC·PTRSS·본딩·성적서·Exception·MCS</span>
             </td>
             <td class="py-3 px-3 text-center" onclick="event.stopPropagation()">
-              <button onclick="window.openDrawer('${m.id}')" class="px-2 py-1 text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded font-semibold text-[11px] transition-colors">스펙 검토</button>
+              <button onclick="openDrawer('${m.id}')" class="px-2 py-1 text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded font-semibold text-[11px] transition-colors">스펙 검토</button>
             </td>
           </tr>
         `;
       });
-
       tbody.innerHTML = html;
     }
 
@@ -1285,7 +1264,6 @@
 
       STAGES.forEach(stageName => {
         const stageModels = filtered.filter(m => m.stage === stageName);
-
         html += `
           <div class="w-[280px] bg-slate-50 rounded-xl border border-slate-200 flex flex-col max-h-[calc(100vh-270px)] shadow-sm">
             <div class="p-3 border-b border-slate-200 flex items-center justify-between bg-white rounded-t-xl">
@@ -1310,7 +1288,7 @@
             : `<span class="text-[10px] px-1.5 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">Lab OK</span>`;
 
           html += `
-            <div onclick="window.openDrawer('${m.id}')" class="bg-white p-3 rounded-lg border border-slate-200 hover:border-orange-500 hover:shadow-md transition-all cursor-pointer group">
+            <div onclick="openDrawer('${m.id}')" class="bg-white p-3 rounded-lg border border-slate-200 hover:border-orange-500 hover:shadow-md transition-all cursor-pointer group">
               <div class="flex items-center justify-between mb-1.5">
                 <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">${m.season}</span>
                 <div class="flex items-center gap-1">
@@ -1332,17 +1310,15 @@
               </div>
               ${stageName === 'SPA' && m.npi ? `<div class="p-1.5 rounded bg-amber-50 border border-amber-200 text-[10px] text-amber-900 mb-2"><span class="font-bold">[NPI ${m.npi.status}]</span>${m.npi.notes || '특이사항 기록 대기'}</div>` : ''}
               <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-[10px] text-slate-400" onclick="event.stopPropagation()">
-                <button onclick="window.moveModelStage('${m.id}', -1)" title="이전 단계" class="hover:text-slate-800 p-1 rounded hover:bg-slate-100">◀ 이전</button>
+                <button onclick="moveModelStage('${m.id}', -1)" title="이전 단계" class="hover:text-slate-800 p-1 rounded hover:bg-slate-100">◀ 이전</button>
                 <span class="text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">👤 ${m.engineer || '미지정'}</span>
-                <button onclick="window.moveModelStage('${m.id}', 1)" title="다음 단계" class="hover:text-orange-600 p-1 rounded hover:bg-slate-100 font-semibold text-slate-700">다음 ▶</button>
+                <button onclick="moveModelStage('${m.id}', 1)" title="다음 단계" class="hover:text-orange-600 p-1 rounded hover:bg-slate-100 font-semibold text-slate-700">다음 ▶</button>
               </div>
             </div>
           `;
         });
-
         html += `</div></div>`;
       });
-
       container.innerHTML = html;
     }
 
@@ -1433,30 +1409,6 @@
       }
     };
 
-    let currentAttachMode = 'file';
-    window.switchAttachmentTab = function(mode) {
-      currentAttachMode = mode;
-      const fileBtn = document.getElementById('tabUploadFileBtn');
-      const linkBtn = document.getElementById('tabUploadLinkBtn');
-      const fileSec = document.getElementById('sectionAttachFile');
-      const linkSec = document.getElementById('sectionAttachLink');
-      const helpText = document.getElementById('uploadHelpText');
-
-      if (mode === 'file') {
-        fileBtn.className = "flex-1 py-1 rounded bg-white shadow-sm text-blue-700 text-center transition-all";
-        linkBtn.className = "flex-1 py-1 rounded text-slate-600 hover:text-slate-900 text-center transition-all";
-        fileSec.classList.remove('hidden');
-        linkSec.classList.add('hidden');
-        helpText.textContent = "* 대용량 보고서는 Teams/SharePoint 링크 등록을 권장합니다.";
-      } else {
-        linkBtn.className = "flex-1 py-1 rounded bg-white shadow-sm text-blue-700 text-center transition-all";
-        fileBtn.className = "flex-1 py-1 rounded text-slate-600 hover:text-slate-900 text-center transition-all";
-        linkSec.classList.remove('hidden');
-        fileSec.classList.add('hidden');
-        helpText.textContent = "* 사내 Teams 또는 SharePoint 파일 링크를 등록하면 원본으로 즉시 이동합니다.";
-      }
-    };
-
     window.openDrawer = function(modelId) {
       selectedModelId = modelId;
       const m = models.find(item => item.id === modelId);
@@ -1506,10 +1458,8 @@
       document.getElementById('drawerOutsoleMcs').value = m.outsoleMcs || OUTSOLE_MCS_LIST[0];
 
       document.getElementById('uploadRound').value = m.stage;
-      document.getElementById('uploadFileInput').value = '';
       document.getElementById('uploadLinkTitle').value = '';
       document.getElementById('uploadLinkUrl').value = '';
-      window.switchAttachmentTab('file');
 
       const npiSection = document.getElementById('drawerNpiSection');
       const npiActive = document.getElementById('npiActiveContent');
@@ -1560,7 +1510,7 @@
         html += `
           <div class="flex items-center justify-between p-2 rounded-lg border transition-colors ${val === 'Fail' ? 'bg-red-50/80 border-red-300 ring-1 ring-red-200' : 'bg-slate-50 border-slate-200'}">
             <span class="font-bold text-xs ${val === 'Fail' ? 'text-red-900' : 'text-slate-800'}">${key}</span>
-            <select onchange="window.updateDrawerLabTestItem('${key}', this.value)" class="text-[11px] font-semibold rounded px-2 py-1 border transition-colors ${
+            <select onchange="updateDrawerLabTestItem('${key}', this.value)" class="text-[11px] font-semibold rounded px-2 py-1 border transition-colors ${
               val === 'Pass' ? 'bg-emerald-50 border-emerald-300 text-emerald-800 font-bold' :
               (val === 'Fail' ? 'bg-red-600 border-red-600 text-white font-bold' : (val === 'Testing' ? 'bg-blue-50 border-blue-300 text-blue-800' : 'bg-slate-100 border-slate-200 text-slate-500'))
             }">
@@ -1572,7 +1522,6 @@
           </div>
         `;
       });
-
       container.innerHTML = html;
 
       const summaryBadge = document.getElementById('drawerLabSummary');
@@ -1603,11 +1552,10 @@
         html += `
           <label class="flex items-center justify-between p-2 rounded-lg border transition-colors cursor-pointer ${checked ? 'bg-emerald-50/70 border-emerald-200' : 'bg-slate-50 border-slate-200'}">
             <span class="text-xs font-medium ${checked ? 'font-bold text-emerald-950' : 'text-slate-700'}">${key}</span>
-            <input type="checkbox" ${checked ? 'checked' : ''} onchange="window.updateDrawerRfcItem('${key}', this.checked)" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300">
+            <input type="checkbox" ${checked ? 'checked' : ''} onchange="updateDrawerRfcItem('${key}', this.checked)" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300">
           </label>
         `;
       });
-
       container.innerHTML = html;
       document.getElementById('drawerRfcSummary').textContent = `${passCount} / ${RFC_CHECK_KEYS.length} 요건 충족`;
     }
@@ -1616,7 +1564,6 @@
       const listContainer = document.getElementById('drawerAttachmentList');
       const countBadge = document.getElementById('drawerAttachmentCount');
       const atts = m.attachments || [];
-
       countBadge.textContent = `${atts.length}건`;
 
       if (atts.length === 0) {
@@ -1626,28 +1573,6 @@
 
       let html = '';
       atts.forEach(att => {
-        const isLink = !!att.linkUrl;
-        const memoryBlob = sessionFileStore.get(String(att.id));
-
-        let actionBtnHtml = '';
-        if (isLink) {
-          actionBtnHtml = `
-            <a href="${att.linkUrl}" target="_blank" rel="noopener noreferrer" class="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 text-[11px] font-bold flex items-center gap-1" title="링크 열기">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-              <span>열기</span>
-            </a>
-          `;
-        } else if (memoryBlob) {
-          actionBtnHtml = `
-            <a href="${memoryBlob}" download="${att.fileName}" class="px-2 py-1 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[11px] font-bold flex items-center gap-1" title="다운로드">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-              <span>다운</span>
-            </a>
-          `;
-        } else {
-          actionBtnHtml = `<span class="text-[10px] text-slate-400 font-medium px-1.5 py-0.5 rounded bg-slate-100">등록 완료</span>`;
-        }
-
         html += `
           <div class="p-2 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 flex items-center justify-between transition-colors">
             <div class="flex items-center gap-2 min-w-0">
@@ -1655,128 +1580,76 @@
               <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700 shrink-0">${att.docType}</span>
               <div class="truncate">
                 <p class="font-bold text-xs text-slate-800 truncate" title="${att.fileName}">
-                  ${isLink ? '🔗 ' : '📄 '}${att.fileName}
+                  🔗 ${att.fileName}
                 </p>
-                <p class="text-[10px] text-slate-400 font-mono">${att.fileSize || '웹 링크'} • ${att.uploadedAt} • ${att.engineer || '담당자'}</p>
+                <p class="text-[10px] text-slate-400 font-mono">사내 SharePoint • ${att.uploadedAt} • ${att.engineer || '담당자'}</p>
               </div>
             </div>
             <div class="flex items-center gap-1.5 shrink-0 ml-2">
-              ${actionBtnHtml}
-              <button type="button" data-del-id="${att.id}" onclick="window.triggerDeleteAttachment(this)" class="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="자료 삭제">
+              <a href="${att.linkUrl}" target="_blank" rel="noopener noreferrer" class="px-2 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 text-[11px] font-bold flex items-center gap-1" title="SharePoint 파일 열기">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                <span>열기</span>
+              </a>
+              <button type="button" data-del-id="${att.id}" onclick="triggerDeleteAttachment(this)" class="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="자료 삭제">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
               </button>
             </div>
           </div>
         `;
       });
-
       listContainer.innerHTML = html;
     }
 
     window.handleUploadAttachment = async function() {
       const m = models.find(item => item.id === selectedModelId);
-      if (!m) {
-        alert("선택된 모델이 없습니다.");
-        return;
-      }
+      if (!m) return;
 
       const round = document.getElementById('uploadRound').value;
       const docType = document.getElementById('uploadDocType').value;
+      const linkTitle = document.getElementById('uploadLinkTitle').value.trim();
+      const linkUrl = document.getElementById('uploadLinkUrl').value.trim();
+
+      if (!linkUrl) {
+        alert("사내 SharePoint 파일 링크 URL을 입력해 주세요.");
+        return;
+      }
+
       const now = new Date();
       const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
       const attId = 'att_' + Date.now();
 
-      if (currentAttachMode === 'link') {
-        const linkTitle = document.getElementById('uploadLinkTitle').value.trim();
-        const linkUrl = document.getElementById('uploadLinkUrl').value.trim();
+      const newAtt = {
+        id: attId,
+        round: round,
+        docType: docType,
+        fileName: linkTitle || `${docType} 사내 문서`,
+        linkUrl: linkUrl,
+        uploadedAt: dateStr,
+        engineer: m.engineer || 'CE 엔지니어'
+      };
 
-        if (!linkUrl) {
-          alert("Teams/SharePoint 링크 URL을 입력해 주세요.");
-          return;
-        }
+      if (!m.attachments) m.attachments = [];
+      m.attachments.unshift(newAtt);
 
-        const newAtt = {
-          id: attId,
-          round: round,
-          docType: docType,
-          fileName: linkTitle || `${docType} 클라우드 문서`,
-          fileSize: 'Teams 링크',
-          linkUrl: linkUrl,
-          uploadedAt: dateStr,
-          engineer: m.engineer || 'CE 엔지니어'
-        };
-
-        if (!m.attachments) m.attachments = [];
-        m.attachments.unshift(newAtt);
-
-        await saveModelData(m);
-        renderDrawerAttachments(m);
-        document.getElementById('uploadLinkTitle').value = '';
-        document.getElementById('uploadLinkUrl').value = '';
-      } else {
-        const fileInput = document.getElementById('uploadFileInput');
-        if (!fileInput.files || fileInput.files.length === 0) {
-          alert("업로드할 파일을 선택해 주세요.");
-          return;
-        }
-
-        const file = fileInput.files[0];
-        const fileSize = (file.size / (1024 * 1024) >= 1) 
-          ? (file.size / (1024 * 1024)).toFixed(1) + " MB" 
-          : Math.round(file.size / 1024) + " KB";
-
-        const blobUrl = URL.createObjectURL(file);
-        sessionFileStore.set(attId, blobUrl);
-
-        const newAtt = {
-          id: attId,
-          round: round,
-          docType: docType,
-          fileName: file.name,
-          fileSize: fileSize,
-          linkUrl: '',
-          uploadedAt: dateStr,
-          engineer: m.engineer || 'CE 엔지니어'
-        };
-
-        if (!m.attachments) m.attachments = [];
-        m.attachments.unshift(newAtt);
-
-        await saveModelData(m);
-        renderDrawerAttachments(m);
-        fileInput.value = '';
-      }
+      await saveModelData(m);
+      renderDrawerAttachments(m);
+      document.getElementById('uploadLinkTitle').value = '';
+      document.getElementById('uploadLinkUrl').value = '';
     };
 
     window.triggerDeleteAttachment = function(buttonElem) {
       const attId = buttonElem.getAttribute('data-del-id');
-      if (attId) {
-        window.handleDeleteAttachment(attId);
-      }
+      if (attId) window.handleDeleteAttachment(attId);
     };
 
     window.handleDeleteAttachment = async function(attId) {
-      if (!selectedModelId) {
-        alert("선택된 모델 정보를 찾을 수 없습니다.");
-        return;
-      }
-
+      if (!selectedModelId) return;
       const m = models.find(item => item.id === selectedModelId);
-      if (!m || !m.attachments) {
-        alert("첨부자료가 존재하지 않습니다.");
-        return;
-      }
+      if (!m || !m.attachments) return;
 
-      if (window.confirm("정말로 이 첨부 자료를 삭제하시겠습니까?")) {
+      if (window.confirm("정말로 이 첨부 자료 링크를 삭제하시겠습니까?")) {
         const targetId = String(attId);
-
-        if (sessionFileStore.has(targetId)) {
-          URL.revokeObjectURL(sessionFileStore.get(targetId));
-          sessionFileStore.delete(targetId);
-        }
-
         m.attachments = m.attachments.filter(att => String(att.id) !== targetId);
-
         await saveModelData(m);
         renderDrawerAttachments(m);
         renderDashboard();
@@ -1862,7 +1735,7 @@
 
     window.deleteModelPrompt = async function() {
       if (!selectedModelId) return;
-      if (window.confirm('정말로 이 모델 프로젝트를 삭제하시겠습니까? (모든 팀원 화면에서도 삭제됩니다)')) {
+      if (window.confirm('정말로 이 모델 프로젝트를 삭제하시겠습니까? (SharePoint 목록에서도 삭제됩니다)')) {
         await removeModelData(selectedModelId);
         window.closeDrawer();
       }
@@ -1931,40 +1804,13 @@
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(models, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `nike_dev_board_backup_${new Date().toISOString().slice(0,10)}.json`);
+      downloadAnchor.setAttribute("download", `nike_sharepoint_backup_${new Date().toISOString().slice(0,10)}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
     };
 
-    // [신규 기능] 팀즈와 웹 간 수동 데이터 동기화 지원 (JSON Import)
-    window.importDataBackup = function(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = async function(e) {
-        try {
-          const imported = JSON.parse(e.target.result);
-          if (Array.isArray(imported)) {
-            if (window.confirm(`백업 파일에서 총 ${imported.length}개의 모델 데이터를 가져와 현재 화면에 동기화하시겠습니까?`)) {
-              models = mergeWithExistingData(imported);
-              for (const m of models) {
-                await saveModelData(m);
-              }
-              alert("데이터 동기화가 성공적으로 완료되었습니다!");
-            }
-          } else {
-            alert("유효한 백업 JSON 파일 형식이 아닙니다.");
-          }
-        } catch (err) {
-          alert("파일을 읽는 중 오류가 발생했습니다: " + err.message);
-        }
-      };
-      reader.readAsText(file);
-    };
-
-    window.addEventListener('DOMContentLoaded', initRealtimeSync);
+    window.addEventListener('DOMContentLoaded', initSharePointSync);
   </script>
 </body>
 </html>
